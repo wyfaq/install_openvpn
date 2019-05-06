@@ -280,7 +280,7 @@ function installQuestions () {
 	echo "   5) Quad9 uncensored (Anycast: worldwide)"
 	echo "   6) FDN (France)"
 	echo "   7) DNS.WATCH (Germany)"
-	echo "   8) OpenDNS (Anycast: worldwide)"
+	echo "   8) 114DNS"
 	echo "   9) Google (Anycast: worldwide)"
 	echo "   10) Yandex Basic (Russia)"
 	echo "   11) AdGuard DNS (Russia)"
@@ -800,8 +800,16 @@ verb 3" >> /etc/openvpn/server.conf
 	if [[ "$IPV6_SUPPORT" = 'y' ]]; then
 		echo 'net.ipv6.conf.all.forwarding=1' >> /etc/sysctl.d/20-openvpn.conf
 	fi
+
 	# Avoid an unneeded reboot
 	sysctl --system
+	sysctl -a | grep "net.ipv4.ip_forward = 1" 
+	if [ $? = 0 ]
+	then
+		echo "路由功能开启成功"
+	else
+		echo "路由功能开启失败，请检查/etc/sysctl.conf 或者 /etc/sysctl.d/ 文件"
+	fi  
 
 	# If SELinux is enabled and a custom port was selected, we need this
 	if hash sestatus 2>/dev/null; then
